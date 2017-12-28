@@ -33,7 +33,17 @@ module Persistence
 
         def update_attributes(updates)
             self.class.update(self.id, updates)
-        end        
+        end
+        
+        method_missing(m, *args, &block)
+            first_part = m[/\A(update_)/]
+            second_part = m[/update_(\w+)/,1]
+
+            if first_part == "update_"
+                self.class.update(self.id, {second_part => args.first})
+            else
+                return "No #{m} method found"
+        end
     end
 
     module ClassMethods
